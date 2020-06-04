@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js 시작하기</title>
+</head>
+<body>
+  <button id="b-button" v-bind:title="loggedInButton">구매</button>
+  <script>
+    // 로딩 및 Vue가 전역 변수로 정의됐는지 확인
+    console.assert(typeof Vue !== 'undefined');
+    var vm = new Vue({
+      el: '#b-button',
+      data: {
+        loggedInButton: '로그인 후에 구매 가능합니다.'
+      }
+    });
+  </script>
+</body>
+</html>

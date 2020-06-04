@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js 시작하기</title>
+</head>
+<body>
+  <div id="app">
+    <p>합계 : {{ items.reduce(function (sum, item) { return sum + (item.price * item.quantity) }, 0) }}</p>
+    <p>합계 (세금 포함) : {{ totalPrice }}</p>
+  </div>
+  <script src="./02_07.js"></script>
+</body>
+</html>
