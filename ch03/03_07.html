@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js 시작하기</title>
+</head>
+<body>
+  <div id="app">
+    <input-date-with-today></input-date-with-today>
+    <simple-counter></simple-counter>
+  </div>
+
+  <script>
+    Vue.component('input-date-with-today', {
+      render: function (createElement) {
+        return createElement(
+          'input',
+          {
+            attrs: {
+              type: 'date',
+              value: new Date().toISOString().substring(0, 10)
+            }
+          }
+        );
+      }
+    });
+
+    Vue.component('simple-counter', {
+      template: '<h1>과일 목록</h1>',
+      data: function () {
+        return {
+          fruits: ['사과', '귤']
+        }
+      }
+    });
+
+    new Vue({ el: '#app' });
+  </script>
+</body>
+</html>
