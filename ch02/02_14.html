@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js 시작하기</title>
+</head>
+<body>
+  <div id="app">
+    <p>{{ count }}</p>
+  </div>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          count: 0,
+          timerId: null
+        };
+      },
+      created: function () {
+        var that = this;
+        console.log('[created] this.count = ', this.count);
+        // DOM 요소가 연결되지 않았기 때문에 undefined임
+        console.log('[created] this.$el = ', this.$el);
+        // Timer 시작
+        this.timerId = setInterval(function () {
+          that.count += 1;
+        }, 1000);
+      },
+      mounted: function () {
+        // DOM 요소가 연결됨
+        console.log('[mounted] this.$el = ', this.$el);
+      },
+      beforeDestroy: function () {
+        // 타이머 정리
+        console.log('[beforeDestroy]');
+        clearInterval(this.timerId);
+      }
+    });
+
+    window.vm = vm;
+  </script>
+</body>
+</html>
