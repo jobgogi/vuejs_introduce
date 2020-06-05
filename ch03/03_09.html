@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js 시작하기</title>
+</head>
+<body>
+  <div id="fruits-component">
+    <ol>
+      <fruits-item-name
+        v-for="fruit in fruitsItems"
+        :key="fruit.name"
+        :fruits-item="fruit">
+      </fruits-item-name>
+    </ol>
+  </div>
+
+  <script>
+    Vue.component('fruits-item-name', {
+      props: {
+        fruitsItem: {
+          type: Object,   // 객체 여부
+          required: true  // 이 컴포넌트에서 반드시 필요하다.
+        }
+      },
+      template: '<li>{{ fruitsItem.name }}</li>'
+    });
+
+    new Vue({ 
+      el: '#fruits-component',
+      data: {
+        fruitsItems: [
+          { name: '배' },
+          { name: '딸기' }
+        ]
+      }
+    });
+  </script>
+</body>
+</html>
