@@ -48,6 +48,29 @@
     </div>
   </script>
 
+  <script type="text/x-template" id="user-create">
+    <div>
+      <div class="sending" v-if="sending">Sending...</div>
+      <div>
+        <h2>신규 사용자 등록</h2>
+        <div>
+          <label>이름 : </label>
+          <input type="text" v-model="user.name">
+        </div>
+        <div>
+          <label>설명 : </label>
+          <input type="text" v-model="user.description">
+        </div>
+        <div v-if="error" class="error">
+          {{ error }}
+        </div>
+        <div>
+          <input type="button" @click="createUser" value="등록">
+        </div>
+      </div>
+    </div>
+  </script>
+
 
   <script>
     // JSON을 반환하는 함수
@@ -78,6 +101,14 @@
         });
 
         callback(null, filteredUsers && filteredUsers[0]);
+      }, 1000);
+    };
+
+    var postUser = function (params, callback) {
+      setTimeout(function () {
+        params.id = userData.length + 1;
+        userData.push(params);
+        callback(null, params);
       }, 1000);
     };
 
@@ -150,6 +181,53 @@
       }
     };
 
+    var UserCreate = {
+      template: '#user-create',
+      data: function () {
+        return {
+          sending: false,
+          user: this.defaultUser(),
+          error: null
+        }
+      },
+      created: function () {
+      },
+      methods: {
+        defaultUser: function () {
+          return {
+            name: '',
+            description: ''
+          };
+        },
+        createUser: function () {
+          if (this.user.name.trim() === '') {
+            this.error = 'Name은 필수입니다';
+            return;
+          }
+
+          if (this.user.description.trim() === '') {
+            this.error = 'Description은 필수입니다';
+            return;
+          }
+
+          this.sending = true;
+
+          postUser(this.user,
+            (function (err, user) {
+              this.sending = false;
+              if (err) {
+                this.error = null
+              } else {
+                this.user = this.defaultUser();
+                alert('신규 사용자가 등록되었습니다');
+                this.$router.push('/users');
+              }
+            }).bind(this)
+          );
+        }
+      }
+    }
+
     var router = new VueRouter({
       routes: [
         {
@@ -161,6 +239,10 @@
         {
           path: '/users',
           component: UserList
+        },
+        {
+          path: '/user/new',
+          component: UserCreate
         },
         {
           path: '/user/:userId',
