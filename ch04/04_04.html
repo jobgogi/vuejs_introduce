@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VueRouter 연습</title>
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <script src="https://unpkg.com/vue-router@3.0.1"></script>
+</head>
+<body>
+  <div id="app">
+    <router-link to="/top">최상위 페이지</router-link>
+    <router-link to="/users">사용자 목록 페이지</router-link>
+    <router-link to="/user/123">123의 상세 페이지</router-link>
+    <router-link :to="{ name: 'user', params: { userId: 123 } }">
+      이름을 가진 라우트를 이용한 상세 페이지 보기
+    </router-link>
+    <router-view></router-view>
+  </div>
+  <script>
+    var router = new VueRouter({
+      routes: [
+        {
+          path: '/top',
+          component: {
+            template: '<div>최상위 페이지</div>'
+          }
+        },
+        {
+          path: '/users',
+          component: {
+            template: '<div>사용자 목록 페이지</div>'
+          },
+          // 라우트 단위 훅
+          beforeEnter: function (to, from, next) {
+            // /users?redirect=true로 접근할 때만 top으로 리다이렉트하는 훅 함수 추가
+            console.log(to.query);
+            if (to.query.redirect === 'true') {
+              next('/top');
+            } else {
+              next();
+            }
+          }
+        },
+        {
+          path: '/user/:userId',
+          name: 'user',
+          component: {
+            template: '<div>사용자 ID는 {{ $route.params.userId }}입니다.'
+          }
+        }
+      ]
+    });
+
+    var app = new Vue({
+      router: router
+    }).$mount('#app');
+  </script>
+</body>
+</html>
