@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue.js SPA 예제 애플리케이션</title>
+  <style>
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav>
+      <!-- router-link를 이용한 네비게이션 정의 -->
+      <router-link to="/top">최상위 페이지</router-link>
+      <router-link to="/users">사용자 목록 페이지</router-link>
+    </nav>
+    <router-view>
+    </router-view>
+  </div>
+
+  <!-- Vue.js와 Vue Router 로딩 -->
+  <script src="https://unpkg.com/vue@2.4.2/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/vue-router@2.7.0/dist/vue-router.min.js"></script>
+
+  <!-- 필요한 컴포넌트 템플릿 정의 -->
+  <script type="text/x-template" id="user-list">
+    <div>사용자 목록 페이지 입니다.</div>
+  </script>
+
+  <script>
+    var UserList = {
+      template: '#user-list'
+    };
+
+    var router = new VueRouter({
+      routes: [
+        {
+          path: '/top',
+          component: {
+            template: '<div>최상위 페이지입니다</div>'
+          }
+        },
+        {
+          path: '/users',
+          component: UserList
+        }
+      ]
+    });
+
+    var app = new Vue({
+      router: router
+    }).$mount('#app');
+  </script>
+</body>
+</html>
