@@ -24,12 +24,70 @@
 
   <!-- 필요한 컴포넌트 템플릿 정의 -->
   <script type="text/x-template" id="user-list">
-    <div>사용자 목록 페이지 입니다.</div>
+    <div>
+      <div class="loading" v-if="loading">로딩 중...</div>
+      <div v-if="error" class="error">
+        {{ error }}
+      </div>
+      <div v-for="user in users" :key="user.id">
+        <h2>{{ user.name }}</h2>
+      </div>
+    </div>
   </script>
 
   <script>
+    // JSON을 반환하는 함수
+    // 이 함수를 사용해 가상의 WEB API를 통해 정보를 받아오는 것으로 생각한다.
+    var getUsers = function (callback) {
+      setTimeout(function () {
+        callback(null, [
+          {
+            id: 1,
+            name: 'Takuya Tejima'
+          },
+          {
+            id: 2,
+            name: 'Yohei Noda'
+          }
+        ]);
+      }, 1000);
+    };
+
     var UserList = {
-      template: '#user-list'
+      template: '#user-list',
+      data: function () {
+        return {
+          loading: false,
+          users: function () {
+            return [];
+          },
+          error: null
+        }
+      },
+      // 초기화 할 때 데이터 받아옴
+      created: function () {
+        console.log('created');
+        this.fetchData();
+      },
+      // $route의 변경을 모니터링하며 라우팅이 수정되면 데이터를 다시 받아옴
+      watch: {
+        '$route': 'fetchData'
+      },
+      methods: {
+        fetchData: function () {
+          this.loading = true;
+          // 받아온 데이터를 users에 저장
+          // Function.prototype.bind는 this의 유효범위를 전달하기 위해 사용
+          getUsers((function(err, users) {
+            this.loading = false;
+            if (err) {
+              this.error = err.toString();
+            } else {
+              this.users = users;
+            }
+          }).bind(this));
+        }
+      }
     };
 
     var router = new VueRouter({
