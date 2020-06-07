@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vue.js SPA 예제 애플리케이션</title>
   <style>
+    [v-cloak] {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -13,6 +16,9 @@
       <!-- router-link를 이용한 네비게이션 정의 -->
       <router-link to="/top">최상위 페이지</router-link>
       <router-link to="/users">사용자 목록 페이지</router-link>
+      <router-link to="/users/new?redirect=true">신규 사용자 등록</router-link>
+      <router-link to="/login" v-show="!Auth.loggedIn()">로그인</router-link>
+      <router-link to="/logout" v-show="Auth.loggedIn()">로그아웃</router-link>
     </nav>
     <router-view>
     </router-view>
@@ -30,11 +36,11 @@
         {{ error }}
       </div>
       <div v-for="user in users" :key="user.id">
-        <h2>{{ user.name }}</h2>
+        <router-link :to="{ path: '/users/' + user.id }">{{ user.name }}</router-link>
       </div>
     </div>
   </script>
-  
+
   <script type="text/x-template" id="user-detail">
     <div>
       <div class="loading" v-if="loading">로딩 중...</div>
@@ -71,6 +77,25 @@
     </div>
   </script>
 
+  <script type="text/x-template" id="login">
+    <div>
+      <h2>Login</h2>
+      <p v-if="$route.query.redirect">
+        로그인이 필요합니다.
+      </p>
+      <form @submit.prevent="login">
+        <label>
+          <input v-model="email" placeholder="email">
+        </label>
+        <label>
+          <input v-model="pass" placeholder="password" type="password">
+        </label>
+        <br>
+        <button type="submit">로그인</button>
+        <p v-if="error" class="error">로그인에 실패했습니다</p>
+      </form>
+    </div>
+  </script>
 
   <script>
     // JSON을 반환하는 함수
@@ -226,7 +251,56 @@
           );
         }
       }
+    };
+
+    var Login = {
+      template: '#login',
+      data: function () {
+        return {
+          email: 'vue@example.com',
+          pass: '',
+          error: false
+        }
+      },
+      methods: {
+        login: function () {
+          Auth.login(this.email, this.pass,
+            (function (loggedIn) {
+              if (!loggedIn) {
+                this.error = true;
+              } else {
+                // redirect 파라미터가 있으면 해당 경로로 이동한다.
+                this.$router.replace(this.$route.query.redirect || '/');
+              }
+            }).bind(this));
+        }
+      }
     }
+
+    var Auth = {
+      login: function (email, pass, cb) {
+        setTimeout(function () {
+          if (email === 'vue@example.com' && pass === 'vue') {
+            // 로그인 성공 시 로컬 스토리지에 token 저장
+            localStorage.token = Math.random().toString(36).substring(7);
+            if (cb) {
+              cb(true);
+            } else {
+              if (cb) {
+                cb(false);
+              }
+            }
+          }
+        }, 0);
+      },
+      logout: function () {
+        delete localStorage.token;
+      },
+      loggedIn: function () {
+        // 로컬 스토리지에 token이 있으면 로그인 상태로 간주
+        return !!localStorage.token;
+      }
+    };
 
     var router = new VueRouter({
       routes: [
@@ -241,12 +315,23 @@
           component: UserList
         },
         {
-          path: '/user/new',
+          path: '/users/new',
           component: UserCreate
         },
         {
-          path: '/user/:userId',
+          path: '/users/:userId',
           component: UserDetail
+        },
+        {
+          path: '/login',
+          component: Login
+        },
+        {
+          path: '/logout',
+          beforeEnter: function (to, from, next) {
+            Auth.logout();
+            next('/');
+          }
         }
       ]
     });
