@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css">
+</head>
+<body>
+  <div id="app">
+    <p><input type="text" v-model="animationClass"></p>
+    <button @click="isShown = !isShown">트랜지션</button>
+    <transition
+      :enter-active-class="activeClass"
+      :leave-active-class="activeClass">
+      <p v-show="isShown">Hello, World</p>
+    </transition>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          animationClass: 'bounce',
+          isShown: false
+        }
+      },
+      computed: {
+        activeClass: function() {
+          return this.animationClass + ' animated';
+        }
+      }
+    })
+  </script>
+</body>
+</html>
