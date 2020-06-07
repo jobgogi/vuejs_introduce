@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue.js SPA 예제 애플리케이션</title>
+  <style>
+    [v-cloak] {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <nav>
+      <!-- router-link를 이용한 네비게이션 정의 -->
+      <router-link to="/top">최상위 페이지</router-link>
+      <router-link to="/users">사용자 목록 페이지</router-link>
+      <router-link to="/users/new?redirect=true">신규 사용자 등록</router-link>
+      <router-link to="/login" v-show="!Auth.loggedIn()">로그인</router-link>
+      <router-link to="/logout" v-show="Auth.loggedIn()">로그아웃</router-link>
+    </nav>
+    <router-view>
+    </router-view>
+  </div>
+
+  <!-- Vue.js와 Vue Router 로딩 -->
+  <script src="https://unpkg.com/vue@2.4.2/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/vue-router@2.7.0/dist/vue-router.min.js"></script>
+
+  <!-- 필요한 컴포넌트 템플릿 정의 -->
+  <script type="text/x-template" id="user-list">
+    <div>
+      <div class="loading" v-if="loading">로딩 중...</div>
+      <div v-if="error" class="error">
+        {{ error }}
+      </div>
+      <div v-for="user in users" :key="user.id">
+        <router-link :to="{ path: '/users/' + user.id }">{{ user.name }}</router-link>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="user-detail">
+    <div>
+      <div class="loading" v-if="loading">로딩 중...</div>
+      <div v-if="error" class="error">
+        {{ error }}
+      </div>
+      <div v-if="user">
+        <h2>{{ user.name }}</h2>
+        <p>{{ user.description }}</h2>
+      </div>
+      <router-link :to="{ path: '/users/' + $route.params.userId + '/profile' }">
+        사용자 프로필 보기
+      </router-link>
+      <router-link :to="{ path: '/users/' + $route.params.userId + '/posts' }">
+        사용자 글 모음 보기
+      </router-link>
+      <router-view></router-view>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="user-create">
+    <div>
+      <div class="sending" v-if="sending">Sending...</div>
+      <div>
+        <h2>신규 사용자 등록</h2>
+        <div>
+          <label>이름 : </label>
+          <input type="text" v-model="user.name">
+        </div>
+        <div>
+          <label>설명 : </label>
+          <input type="text" v-model="user.description">
+        </div>
+        <div v-if="error" class="error">
+          {{ error }}
+        </div>
+        <div>
+          <input type="button" @click="createUser" value="등록">
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="login">
+    <div>
+      <h2>Login</h2>
+      <p v-if="$route.query.redirect">
+        로그인이 필요합니다.
+      </p>
+      <form @submit.prevent="login">
+        <label>
+          <input v-model="email" placeholder="email">
+        </label>
+        <label>
+          <input v-model="pass" placeholder="password" type="password">
+        </label>
+        <br>
+        <button type="submit">로그인</button>
+        <p v-if="error" class="error">로그인에 실패했습니다</p>
+      </form>
+    </div>
+  </script>
+
+  <script>
+    // JSON을 반환하는 함수
+    // 이 함수를 사용해 가상의 WEB API를 통해 정보를 받아오는 것으로 생각한다.
+    var userData = [
+      {
+        id: 1,
+        name: 'Takuya Tejima',
+        description: '동남아시아에서 일하는 엔지니어입니다.'
+      },
+      {
+        id: 2,
+        name: 'Yohei Noda',
+        description: '아웃도어, 풋살이 취미인 엔지니어입니다.'
+      }
+    ];
+
+    var getUsers = function (callback) {
+      setTimeout(function () {
+        callback(null, userData);
+      }, 1000);
+    };
+
+    var getUser = function (userId, callback) {
+      setTimeout(function () {
+        var filteredUsers = userData.filter(function (user) {
+          return user.id === parseInt(userId, 10);
+        });
+
+        callback(null, filteredUsers && filteredUsers[0]);
+      }, 1000);
+    };
+
+    var postUser = function (params, callback) {
+      setTimeout(function () {
+        params.id = userData.length + 1;
+        userData.push(params);
+        callback(null, params);
+      }, 1000);
+    };
+
+    var UserList = {
+      template: '#user-list',
+      data: function () {
+        return {
+          loading: false,
+          users: function () {
+            return [];
+          },
+          error: null
+        }
+      },
+      // 초기화 할 때 데이터 받아옴
+      created: function () {
+        console.log('created');
+        this.fetchData();
+      },
+      // $route의 변경을 모니터링하며 라우팅이 수정되면 데이터를 다시 받아옴
+      watch: {
+        '$route': 'fetchData'
+      },
+      methods: {
+        fetchData: function () {
+          this.loading = true;
+          // 받아온 데이터를 users에 저장
+          // Function.prototype.bind는 this의 유효범위를 전달하기 위해 사용
+          getUsers((function(err, users) {
+            this.loading = false;
+            if (err) {
+              this.error = err.toString();
+            } else {
+              this.users = users;
+            }
+          }).bind(this));
+        }
+      }
+    };
+
+    var UserDetail = {
+      template: '#user-detail',
+      data: function () {
+        return {
+          loading: false,
+          user: null,
+          error: null
+        };
+      },
+      created: function () {
+        this.fetchData();
+      },
+      watch: {
+        '$route': 'fetchData'
+      },
+      methods: {
+        fetchData: function () {
+          this.loading = true;
+          // this.$route.params.userId에 현재 URL 파라미터에 해당하는 userId를 저장
+          getUser(this.$route.params.userId, 
+            (function (err, user) {
+              this.loading = false;
+              if (err) {
+                this.error = err.toString();
+              } else {
+                this.user = user;
+              }
+            }).bind(this));
+        }
+      }
+    };
+
+    var UserCreate = {
+      template: '#user-create',
+      data: function () {
+        return {
+          sending: false,
+          user: this.defaultUser(),
+          error: null
+        }
+      },
+      created: function () {
+      },
+      methods: {
+        defaultUser: function () {
+          return {
+            name: '',
+            description: ''
+          };
+        },
+        createUser: function () {
+          if (this.user.name.trim() === '') {
+            this.error = 'Name은 필수입니다';
+            return;
+          }
+
+          if (this.user.description.trim() === '') {
+            this.error = 'Description은 필수입니다';
+            return;
+          }
+
+          this.sending = true;
+
+          postUser(this.user,
+            (function (err, user) {
+              this.sending = false;
+              if (err) {
+                this.error = null
+              } else {
+                this.user = this.defaultUser();
+                alert('신규 사용자가 등록되었습니다');
+                this.$router.push('/users');
+              }
+            }).bind(this)
+          );
+        }
+      }
+    };
+
+    var Login = {
+      template: '#login',
+      data: function () {
+        return {
+          email: 'vue@example.com',
+          pass: '',
+          error: false
+        }
+      },
+      methods: {
+        login: function () {
+          Auth.login(this.email, this.pass,
+            (function (loggedIn) {
+              if (!loggedIn) {
+                this.error = true;
+              } else {
+                // redirect 파라미터가 있으면 해당 경로로 이동한다.
+                this.$router.replace(this.$route.query.redirect || '/');
+              }
+            }).bind(this));
+        }
+      }
+    }
+
+    var Auth = {
+      login: function (email, pass, cb) {
+        setTimeout(function () {
+          if (email === 'vue@example.com' && pass === 'vue') {
+            // 로그인 성공 시 로컬 스토리지에 token 저장
+            localStorage.token = Math.random().toString(36).substring(7);
+            if (cb) {
+              cb(true);
+            } else {
+              if (cb) {
+                cb(false);
+              }
+            }
+          }
+        }, 0);
+      },
+      logout: function () {
+        delete localStorage.token;
+      },
+      loggedIn: function () {
+        // 로컬 스토리지에 token이 있으면 로그인 상태로 간주
+        return !!localStorage.token;
+      }
+    };
+
+    var router = new VueRouter({
+      routes: [
+        {
+          path: '/top',
+          component: {
+            template: '<div>최상위 페이지입니다</div>'
+          }
+        },
+        {
+          path: '/users',
+          component: UserList
+        },
+        {
+          path: '/users/new',
+          component: UserCreate
+        },
+        {
+          path: '/users/:userId',
+          component: UserDetail,
+          name: 'user',
+          children: [
+            {
+              path: 'profile',
+              component: {
+                template: `
+                  <div class="user-profile">
+                    <h3>사용자 {{ $route.params.userId }} 의 프로필 페이지입니다.</h3>
+                  </div>
+                `
+              }
+            },
+            {
+              path: 'posts',
+              component: {
+                template: `
+                  <div class="user-posts">
+                    <h3>사용자 {{ $route.params.userId }} 의 글모음 페이지입니다.</h3>
+                  </div>
+                `
+              }
+            }
+          ]
+        },
+        {
+          path: '/login',
+          component: Login
+        },
+        {
+          path: '/logout',
+          beforeEnter: function (to, from, next) {
+            Auth.logout();
+            next('/');
+          }
+        }
+      ]
+    });
+
+    var app = new Vue({
+      router: router
+    }).$mount('#app');
+  </script>
+</body>
+</html>
