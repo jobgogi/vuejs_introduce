@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js SLOT</title>
+</head>
+<body>
+  <div id="app">
+    <todo-list :todos="todos">
+      <li slot-scope="slotProps" v-if="slotProps.todo.isCompleted">
+        {{ slotProps.todo.text }}
+      </li>
+    </todo-list>
+    <hr>
+    <todo-list :todos="todos">
+      <li slot-scope="{ todo }" v-if="todo.isCompleted">
+        {{ todo.text }}
+      </li>
+    </todo-list>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
