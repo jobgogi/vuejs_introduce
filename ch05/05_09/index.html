@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js Directive</title>
+</head>
+<body>
+  <div id="app">
+    <img v-fallback-image src="./logo.png" :alt="altText">
+  </div>
+  <script>
+    Vue.directive('fallback-image', {
+      bind: function(el) {
+        el.addEventListener('error', function () {
+          el.src = 'https://dummyimage.com/400x400/000/ffffff.png&text=no+image';
+        });
+      },
+      update: function (el, binding) {
+        console.log('update', binding);
+      }
+    });
+    var vm = new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          altText: 'logo'
+        };
+      }
+    });
+  </script>
+</body>
+</html>
