@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@2.5.17"></script>
+  <title>Vue.js SLOT</title>
+</head>
+<body>
+  <div id="app">
+    <my-page>
+      <!-- name 속성 값이 header의 <slot>과 치환됨 -->
+      <h1 slot="header">This is my page</h1>
+      <!-- 단일 슬롯과 치환되는 콘텐츠 -->
+      <p>Consectetur est enim tempor ipsum commodo. Nostrud pariatur esse aliqua id laboris consequat duis. Veniam incididunt reprehenderit in nulla do ipsum. Nostrud voluptate duis est ex ea reprehenderit pariatur minim nisi elit mollit consequat. Irure velit excepteur cupidatat tempor magna non commodo ad Lorem officia voluptate Lorem.</p>
+      <!-- name 속성 값이 footer의 <slot>과 치환됨 -->
+      <p slot="footer">This is footer</p>
+    </my-page>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
