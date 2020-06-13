@@ -45,6 +45,10 @@
     <form v-on:submit.prevent="addLabel">
       <input type="text" v-model="form.newLabelText" placeholder="새 레이블">
     </form>
+
+    <h2>저장 및 복원</h2>
+    <button type="button" v-on:click="save">저장</button>
+    <button type="button" v-on:click="restore">복원</button>
   </div>
 </template>
 <script>
@@ -98,6 +102,12 @@ export default {
       this.$store.commit('changeFilter', {
         filter: labelId
       });
+    },
+    save() {
+      this.$store.dispatch('save');
+    },
+    restore() {
+      this.$store.dispatch('restore');
     }
   }
 }
