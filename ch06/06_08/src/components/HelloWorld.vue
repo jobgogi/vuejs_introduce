@@ -7,6 +7,7 @@
     <button @click="decrement">-</button>
     <button @click="incrementAction">Action</button>
     <button :disabled="loading" @click="incrementAsync">Async Action</button>
+    <button :disabled="loading" @click="incrementAwait">Async - Await Action</button>
   </div>
 </template>
 
@@ -38,6 +39,16 @@ export default {
       this.$store.dispatch('incrementAsync', { type: 'one' }).then(() => {
         this.$store.commit('loading', { loading: false });
       });
+    },
+    async incrementAwait() {
+      try {
+        this.$store.commit('loading', { loading: true });
+        await this.$store.dispatch('incrementAsync', { type: 'one' });
+      } catch (e) {
+        console.log(e);
+      } finally {
+        this.$store.commit('loading', { loading: false });
+      }
     }
   }
 }
