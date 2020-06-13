@@ -1,10 +1,12 @@
 <template>
   <div class="hello">
     <p>{{ msg }}</p>
+    <template v-if="loading">LOADING...</template>
     <p>{{ count }}</p>
     <button @click="increment">+</button>
     <button @click="decrement">-</button>
     <button @click="incrementAction">Action</button>
+    <button :disabled="loading" @click="incrementAsync">Async Action</button>
   </div>
 </template>
 
@@ -30,6 +32,12 @@ export default {
     },
     incrementAction() {
       this.$store.dispatch('incrementAction');
+    },
+    incrementAsync() {
+      this.$store.commit('loading', { loading: true });
+      this.$store.dispatch('incrementAsync', { type: 'one' }).then(() => {
+        this.$store.commit('loading', { loading: false });
+      });
     }
   }
 }

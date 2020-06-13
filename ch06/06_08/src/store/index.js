@@ -3,12 +3,30 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex);
 
-// function getCountNum(type) {
-//   return new Promise(resolve => {
-//     setTimeout(() =>{
-//     }, 1000);
-//   });
-// };
+function getCountNum(type) {
+  return new Promise(resolve => {
+    setTimeout(() =>{
+      let amount;
+      switch(type) {
+        case 'one':
+          amount= 1;
+          break;
+        case 'two':
+          amount= 2;
+          break;
+        case 'ten':
+          amount= 10;
+          break;
+        default:
+          amount = 0;
+      }
+
+      resolve({
+        amount
+      });
+    }, 1000);
+  });
+}
 
 const store = new Vuex.Store({
   // 애플리케이션의 스테이트
@@ -16,7 +34,8 @@ const store = new Vuex.Store({
   // * 로그인한 사용자 정보 등 전체 애플리케이션에서 사용하는 데이터
   // * 전자 상거래 사이트의 상품 정보처럼 애플리케이션 여러 곳에서 사용될 가능성이 있는 데이터
   state: {
-    count: 0
+    count: 0,
+    loading: false
   },
   // state를 업데이트를 한다
   mutations: {
@@ -28,6 +47,12 @@ const store = new Vuex.Store({
     },
     decrement(state, payload) {
       state.count = state.count - payload.amount;
+    },
+    increment2(state, payload) {
+      state.count += payload.amount;
+    },
+    loading(state, payload) {
+      state.loading = payload.loading;
     }
   },
   // Ajax요청 등의 비동기 처리 및 로컬 스토리지를 읽고 쓰는
@@ -35,6 +60,18 @@ const store = new Vuex.Store({
   actions: {
     incrementAction(ctx) {
       ctx.commit('increments');
+    },
+    incrementAsync({ commit }, payload) {
+      return getCountNum(payload.type)
+              .then(data => {
+                console.log(data);
+                commit('increment2', {
+                  amount: data.amount
+                });
+                // commit('loading', {
+                //   loading: false
+                // });
+              });
     }
   },
   // 스테이트의 일부 혹은 스테이트로부터 계산된 값을 반환
