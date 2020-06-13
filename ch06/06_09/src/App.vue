@@ -16,6 +16,23 @@
       <input type="text" v-model="form.newTaskName" placeholder="새 태스크">
     </form>
 
+    <h2>레이블로 필터링</h2>
+    <ul>
+      <li v-for="label in labels" v-bind:key="label.id">
+        <input type="radio" :id="`label-filter-${label.id}`"
+          v-bind:checked="label.id === filter"
+          v-on:change="changeFilter(label.id)">
+        <label :for="`label-filter-${label.id}`">&nbsp;{{ label.text }}</label>
+      </li>
+      <li>
+        <input type="radio"
+          id="label-filter-null"
+          v-bind:checked="filter === null"
+          v-on:change="changeFilter(null)">
+        <label for="label-filter-null">필터링 없음</label>
+      </li>
+    </ul>
+
     <h2>레이블 목록</h2>
     <ul>
       <li v-for="label in labels" v-bind:key="label.id">
@@ -43,10 +60,14 @@ export default {
   },
   computed: {
     tasks() {
-      return this.$store.state.tasks;
+      // return this.$store.state.tasks;
+      return this.$store.getters.filteredTasks;
     },
     labels() {
       return this.$store.state.labels;
+    },
+    filter() {
+      return this.$store.state.filter;
     }
   },
   methods: {
@@ -67,11 +88,16 @@ export default {
       this.$store.commit('addLabel', {
         text: this.form.newLabelText
       });
-      this.newLabelText = '';
+      this.form.newLabelText = '';
     },
     getLabelText(id) {
       const label = this.labels.filter(label => label.id === id)[0];
       return label ? label.text : '';
+    },
+    changeFilter(labelId) {
+      this.$store.commit('changeFilter', {
+        filter: labelId
+      });
     }
   }
 }
