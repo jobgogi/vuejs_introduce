@@ -3,7 +3,57 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
+function getCountNum(type) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      let amount = 0;
+
+      switch (type) {
+        case 'one':
+          amount = 1;
+          break;
+        case 'two':
+          amount = 2;
+          break;
+        case 'ten':
+          amount = 10;
+          break;
+        default:
+          amount = 0;
+      }
+
+      resolve(amount);
+    }, 1000);
+  });
+}
+
+const counter = {
+  state: {
+    amount: 10
+  },
+  getters: {
+    squared: state => state.amount * state.amount
+  },
+  mutations: {
+    increment(state, { amount }) {
+      state.amount += amount;
+    }
+  },
+  actions: {
+    incrementAsync({ commit }, payload) {
+      console.log('payload');
+      return getCountNum(payload.type)
+        .then(data => {
+          console.log(data);
+          commit('increment', {
+            amount: data
+          });
+        })
+    }
+  }
+};
+
+const task = {
   state: {
     tasks: [
       {
@@ -98,6 +148,13 @@ const store = new Vuex.Store({
         commit('restore', JSON.parse(data));
       }
     }
+  }
+};
+
+const store = new Vuex.Store({
+  modules: {
+    counter,
+    task
   }
 });
 

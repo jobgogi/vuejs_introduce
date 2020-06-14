@@ -49,6 +49,13 @@
     <h2>저장 및 복원</h2>
     <button type="button" v-on:click="save">저장</button>
     <button type="button" v-on:click="restore">복원</button>
+
+    <h2>Module Counter</h2>
+    <p>Amount : {{ counter }}</p>
+    <p>Squared : {{ squared }}</p>
+    <button type="button" @click="increment('one')" :disabled="isCounting">+ 1</button>
+    <button type="button" @click="increment('two')" :disabled="isCounting">+ 2</button>
+    <button type="button" @click="increment('ten')" :disabled="isCounting">+ 10</button>
   </div>
 </template>
 <script>
@@ -59,19 +66,25 @@ export default {
         newTaskName: '',
         newTaskLabelIds: [],
         newLabelText: ''
-      }
+      },
+      isCounting: false
     }
   },
   computed: {
+    counter() {
+      return this.$store.state.counter.amount
+    },
     tasks() {
-      // return this.$store.state.tasks;
       return this.$store.getters.filteredTasks;
     },
     labels() {
-      return this.$store.state.labels;
+      return this.$store.state.task.labels;
     },
     filter() {
-      return this.$store.state.filter;
+      return this.$store.state.task.filter;
+    },
+    squared() {
+      return this.$store.getters.squared;
     }
   },
   methods: {
@@ -108,6 +121,12 @@ export default {
     },
     restore() {
       this.$store.dispatch('restore');
+    },
+    increment(type) {
+      this.isCounting = true;
+      this.$store.dispatch('incrementAsync', { type }).then(() => {
+        this.isCounting = false;
+      });
     }
   }
 }
