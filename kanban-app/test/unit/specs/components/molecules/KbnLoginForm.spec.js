@@ -9,7 +9,7 @@ describe('KbnLoginForm', () => {
       beforeEach(done => {
         loginForm = mount(KbnLoginForm, {
           propsData: {
-            onLogin: () => {}
+            onlogin: () => {}
           }
         })
         loginForm.vm.$nextTick(done)
@@ -49,7 +49,7 @@ describe('KbnLoginForm', () => {
               loginForm.setData({
                 email: 'foo@domain.com'
               })
-              expect(loginForm.vm.validation.email.format).to.equal(false)
+              expect(loginForm.vm.validation.email.format).to.equal(true)
             })
           })
         })
@@ -85,7 +85,7 @@ describe('KbnLoginForm', () => {
       beforeEach(done => {
         loginForm = mount(KbnLoginForm, {
           propsData: {
-            onLogin: () => {}
+            onlogin: () => {}
           }
         })
         loginForm.vm.$nextTick(done)
@@ -120,7 +120,7 @@ describe('KbnLoginForm', () => {
       beforeEach(done => {
         loginForm = mount(KbnLoginForm, {
           propsData: {
-            onLogin: () => {}
+            onlogin: () => {}
           }
         })
         loginForm.vm.$nextTick(done)
@@ -159,16 +159,16 @@ describe('KbnLoginForm', () => {
     })
     // END disableLoginAction
 
-    // BEGIN onLogin
-    describe('onLogin', () => {
+    // BEGIN onlogin
+    describe('onlogin', () => {
       let loginForm
-      let onLoginSub
+      let onloginStub
 
       beforeEach(done => {
-        onLoginSub = sinon.stub()
+        onloginStub = sinon.stub()
         loginForm = mount(KbnLoginForm, {
           propsData: {
-            onLogin: onLoginSub
+            onlogin: onloginStub
           }
         })
         loginForm.setData({
@@ -180,18 +180,18 @@ describe('KbnLoginForm', () => {
 
       describe('resolve', () => {
         it('resolve 됨', done => {
-          onLoginSub.resolves()
+          onloginStub.resolves()
 
           // 퀵 이벤트
           loginForm.find('button').trigger('click')
-          expect(onLoginSub.called).to.equal(false) // 아직 resolve가 되지 않음
+          expect(onloginStub.called).to.equal(false) // 아직 resolve가 되지 않음
           expect(loginForm.vm.error).to.equal('') // 오류 메시지 초기화
           expect(loginForm.vm.disabledLoginAction).to.equal(true) // 로그인 액션 불가
 
           // 상태 반영
           loginForm.vm.$nextTick(() => {
-            expect(onLoginSub.called).to.equal(true) // resolve 됨
-            const authInfo = onLoginSub.args[0][0]
+            expect(onloginStub.called).to.equal(true) // resolve 됨
+            const authInfo = onloginStub.args[0][0]
             expect(authInfo.email).to.equal(loginForm.vm.email)
             expect(authInfo.password).to.equal(loginForm.vm.password)
 
@@ -206,18 +206,18 @@ describe('KbnLoginForm', () => {
 
       describe('reject', () => {
         it('reject 됨', done => {
-          onLoginSub.rejects(new Error('login error!'))
+          onloginStub.rejects(new Error('login error!'))
 
           // 퀵 이벤트
           loginForm.find('button').trigger('click')
-          expect(onLoginSub.called).to.equal(false) // 아직 reject 되지 않음
+          expect(onloginStub.called).to.equal(false) // 아직 reject 되지 않음
           expect(loginForm.vm.error).to.equal('') // 오류 메시지 초기화
           expect(loginForm.vm.disabledLoginAction).to.equal(true) // 로그인 액션 불가
 
           // 상태 반영
           loginForm.vm.$nextTick(() => {
-            expect(onLoginSub.called).to.equal(true) // reject 됨
-            const authInfo = onLoginSub.args[0][0]
+            expect(onloginStub.called).to.equal(true) // reject 됨
+            const authInfo = onloginStub.args[0][0]
             expect(authInfo.email).to.equal(loginForm.vm.email)
             expect(authInfo.password).to.equal(loginForm.vm.password)
 
@@ -230,6 +230,6 @@ describe('KbnLoginForm', () => {
         })
       })
     })
-    // END onLogin
+    // END onlogin
   })
 })
