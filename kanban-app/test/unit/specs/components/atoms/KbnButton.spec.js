@@ -51,7 +51,7 @@ describe('KbnButton', () => {
                 disabled: true
               }
             })
-            expect(button.attributes().disabled).to.be.an('disabled')
+            expect(button.attributes().disabled).to.equal('disabled')
           })
         })
 
