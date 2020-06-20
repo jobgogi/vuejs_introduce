@@ -8,8 +8,7 @@ export default [{
   meta: { requiresAuth: true }
 }, {
   path: '/login',
-  component: KbnLoginView,
-  meta: { requiresAuth: true }
+  component: KbnLoginView
 }, {
   path: '/tasks/:id',
   component: KbnTaskDetailModal,
