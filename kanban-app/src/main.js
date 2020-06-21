@@ -8,6 +8,7 @@ import router from './router'
 import store from './store'
 
 Vue.config.productionTip = false
+Vue.config.performance = process.env.NODE_ENV === 'development'
 
 Vue.component(ErrorBoundary.name, ErrorBoundary)
 
